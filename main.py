@@ -110,7 +110,6 @@ mrl7 = "songs_collection\\Perfect.mp3"
 
 song_list = [mrl1, mrl2, mrl3, mrl4, mrl5, mrl6, mrl7]
 
-
 # ---------------------------- PLAY MUSIC -------------------------------- #
 # Stop playing the current song
 def music_stop():
@@ -122,21 +121,23 @@ def music_stop():
 
 def music_on():
     global music_state
-    random.shuffle(song_list)
-    mixer.get_init()
-    mixer.init()
-    mixer.music.load(random.choice(song_list))
-    mixer.music.set_volume(0.7)
-    mixer.music.play(0)
-    print(mixer.get_busy())
-    # que()
+    music_state = 0
+    if music_state == 0:
+        random.shuffle(song_list)
+        mixer.get_init()
+        mixer.init()
+        mixer.music.load(random.choice(song_list))
+        mixer.music.set_volume(0.7)
+        mixer.music.play(0)
+        check_if_finished()
 
 
-def que():
-    global song_list, music_state
-    # while mixer.music.get_busy() != 0:
-    #     if mixer.music.get_busy() == 0:
-    #         music_on()
+def check_if_finished():
+    global music_state, paused
+    if music_state != 1:
+        if not mixer.music.get_busy() and paused == False:
+            window.after(ms=1, func=music_on)
+        window.after(ms=1, func=check_if_finished)
 
 
 # Pause and unpause the current song
@@ -150,7 +151,6 @@ def music_pause():
     else:
         mixer.music.unpause()
         paused = False
-
 
 # Buttons
 start_button = Button(text="Start", font=(FONT_NAME, 16, "bold"), highlightthickness=0, command=timer)
